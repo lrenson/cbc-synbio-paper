@@ -1,0 +1,6 @@
+# Default autosave extension
+*.asv
+
+# Figures and data
+*.fig
+*.mat
