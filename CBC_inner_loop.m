@@ -83,14 +83,14 @@ while (endflag)
     
     if Par.MPC_flag==1
 
+        x_hat=kalm_sys.a*x_hat+kalm_sys.b*[y_LacI(j);y_TetR(j);fixed_act;INPUT_act(end)];%INPUT_act(j)
+        x_esti(:,j+1)=x_hat;
+        
         %% MPC INPUT Computation
-        [input_act, cost_val, stack] = MPC_optimization_block(x_esti(:,j), reference, j, INPUT_act(end), sys, Par.sim, Par.ctrl, Ts);
+        [input_act, cost_val, stack] = MPC_optimization_block(x_hat, reference, j, INPUT_act(end), sys, Par.sim, Par.ctrl, Ts);
         Optimizer.error = [Optimizer.error stack.err];
         Optimizer.du = [Optimizer.du stack.d_u];
         Cost_val = [Cost_val; cost_val];
-        
-        x_hat=kalm_sys.a*x_hat+kalm_sys.b*[y_LacI(j);y_TetR(j);fixed_act;INPUT_act(end)];%INPUT_act(j)
-        x_esti(:,j+1)=x_hat;
         
     else
         %% PID INPUT Computation

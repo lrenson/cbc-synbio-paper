@@ -3,18 +3,18 @@ close all;
 clc;
 strname = 'INSERT_A_NAME'
 %% *** COMMON PARAMETERS ***
-MPC_flag = true; %true= MPC strategy; false = Proportional control
+MPC_flag = false; %true= MPC strategy; false = Proportional control
 Parameters.MPC_flag = MPC_flag;
 
-ODE_flag = false; %true= ODE system; false = SDE system
+ODE_flag = true; %true= ODE system; false = SDE system
 Parameters.ODE_flag = ODE_flag;
-Parameters.sim.endflag = true; %if false, all steady states are evaluated after a fixed time.
+Parameters.sim.endflag = false; %if false, all steady states are evaluated after a fixed time.
                                 %if true, the reference steps after a variable time, depending
                                 %on whether the system is at steady state or not.
 Parameters.sim.nrep = 1; %1,5 or 10; number of repetitions, in case of a stochastic simulation
-Parameters.sim.npts = 5; %or 30, 10, 12; number of points to be caught by the CBC algorithm
+Parameters.sim.npts = 30; %or 30, 10, 12; number of points to be caught by the CBC algorithm
 % Parameters.sim.reference =linspace(100,1500,Parameters.sim.npts);%65-1200,1500 Higher span for P controller
-Parameters.sim.reference =fliplr(linspace(0,1200,Parameters.sim.npts ));%0-1200,0-1500
+Parameters.sim.reference =fliplr(linspace(0,1500,Parameters.sim.npts ));%0-1200,0-1500
 % Initial_x0 = [37; 0.8; 2237; 61 ];
 initIPTG = 1; %initial IPTG
 initATC = 25; %initial aTc
@@ -63,8 +63,8 @@ if MPC_flag==1
     load('kalman_systems.mat');%system with kalman filter
     ID_SYS.kalm_sys=Kalman_SYS_HIGH;
     ID_SYS.system_td=c2d(SYS_TC_HIGHER,Parameters.time.Ts);% control horizon
-    x_hat2 = [ 0; 0; 0; 0];
-    for k=1:1
+    x_hat2 = ID_SYS.system_td.x0;
+    for k=1:4
     x_hat2 = ID_SYS.kalm_sys.a*x_hat2+ID_SYS.kalm_sys.b*[Initial_x0(3);Initial_x0(4);initATC;initIPTG];
     end
 
@@ -72,7 +72,7 @@ if MPC_flag==1
     
     Parameters.sim.x_hat = x_hat2;
     Parameters.sim.N = 3;%prediction horizon for the MPC
-    Parameters.sim.ctrlbandwidth = 0.4; %control bandwidth tolerance in the MPC optimization routine 0.3
+    Parameters.sim.ctrlbandwidth = 0.3; %control bandwidth tolerance in the MPC optimization routine 0.3
     Parameters.ctrl.last_ctrl = 0; %Last control action, initial value
     
     %% CELLS STRUCT DATA
